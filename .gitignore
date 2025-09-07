@@ -1,2 +1,5 @@
 Dataset/
 .idea/
+FineTunning_classifier.py
+Preproccessing.py
+trial.py
