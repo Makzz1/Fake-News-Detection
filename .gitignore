@@ -1,5 +1,6 @@
 Dataset/
 .idea/
+/app/models
 FineTunning_classifier.py
 Preproccessing.py
 trial.py

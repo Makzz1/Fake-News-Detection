@@ -23,3 +23,5 @@ clf.fit(X_train, y_train)
 # 6. Evaluate
 y_pred = clf.predict(X_test)
 print("Accuracy:", accuracy_score(y_test, y_pred))
+
+
