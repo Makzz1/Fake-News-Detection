@@ -155,13 +155,51 @@ def predict(req: PredictRequest):
             current_score = score
             subtoken_count = 1
 
-    # Append the very last word after the loop finishes
+    # If there's a remaining word after the loop, add it
     if current_word != "":
         highlights.append({"token": current_word, "score": float(current_score)})
 
-    # --- THIS WAS MISSING ---
+    # 4. Gemini Fact Check
+    gemini_status = "no"  # Default if key is missing or error
+    gemini_reason = "Could not verify."
+    try:
+        import google.generativeai as genai
+        import json
+        
+        # --- USER: REPLACE THIS WITH YOUR ACTUAL API KEY ---
+        GEMINI_API_KEY = "AIzaSyApfzVcknoE5JVpGaNpTrJ_WQwO7eUC4A8" 
+        
+        if GEMINI_API_KEY:
+            genai.configure(api_key=GEMINI_API_KEY)
+            # Use 'gemini-2.5-flash' as verified from available models list
+            model_gemini = genai.GenerativeModel('gemini-2.5-flash')
+            
+            prompt = f"""
+            Analyze the following text for factual accuracy.
+            Provide your response in raw JSON format with two keys:
+            1. "status": One of "true" (fact), "false" (fake/falsehood), or "no" (opinion/vague).
+            2. "reason": A single short sentence explaining why.
+            
+            Text: {req.text}
+            """
+            
+            response = model_gemini.generate_content(prompt)
+            # Clean up potential markdown formatting in response
+            clean_response = response.text.strip().replace("```json", "").replace("```", "")
+            result_json = json.loads(clean_response)
+            
+            gemini_status = result_json.get("status", "no").lower()
+            gemini_reason = result_json.get("reason", "No reason provided.")
+            
+    except Exception as e:
+        print(f"Gemini API Error: {e}")
+        gemini_status = "error"
+        gemini_reason = f"Error: {str(e)}"
+
     return {
-        "is_fake": bool(pred_label == 1),
+        "is_fake": bool(pred_label == 0),
         "confidence": confidence,
-        "attention_data": highlights
+        "attention_data": highlights,
+        "gemini_verification": gemini_status,
+        "gemini_reason": gemini_reason
     }
