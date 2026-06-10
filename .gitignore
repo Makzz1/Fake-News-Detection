@@ -4,3 +4,6 @@ Dataset/
 FineTunning_classifier.py
 Preproccessing.py
 trial.py
+*.docx
+*.zip
+.env

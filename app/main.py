@@ -7,6 +7,10 @@ from pydantic import BaseModel
 from typing import List, Dict, Any
 from transformers import AutoModel, AutoTokenizer
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+load_dotenv()
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 app = FastAPI(title="Fake News Detector API", version="2.0.0")
 
@@ -167,7 +171,7 @@ def predict(req: PredictRequest):
         import json
         
         # --- USER: REPLACE THIS WITH YOUR ACTUAL API KEY ---
-        GEMINI_API_KEY = "AIzaSyApfzVcknoE5JVpGaNpTrJ_WQwO7eUC4A8" 
+        GEMINI_API_KEY = GEMINI_API_KEY
         
         if GEMINI_API_KEY:
             genai.configure(api_key=GEMINI_API_KEY)
